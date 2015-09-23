@@ -6,12 +6,6 @@ import (
 	"net"
 	"strconv"
 	"bufio"
-	"log"
-	"os"
-)
-
-var (
-	trace *log.Logger = log.New(os.Stdout, "TRACE: ", log.Ldate | log.Ltime | log.Lshortfile)
 )
 
 type multiEchoServer struct {
@@ -78,8 +72,7 @@ func (mes *multiEchoServer) handleAccept(ln net.Listener) {
 		}
 			conn, err := ln.Accept()
 			if err != nil {
-				trace.Print("Couldn't accept: ", err)
-				continue
+				return
 			}
 			worker := workerServer{
 				master: mes,
@@ -126,7 +119,6 @@ func (worker *workerServer) handleReq() {
 			worker.master.ctrl<- true
 			break
 		}
-//		trace.Print(line)
 		outMsg := append(line[:len(line) - 1], line...) // Trim the first "\n"
 		worker.outMsg <- string(outMsg)
 	}
